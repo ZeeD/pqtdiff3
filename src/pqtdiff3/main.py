@@ -1,9 +1,8 @@
-from collections.abc import Iterator
-from difflib import SequenceMatcher
 from enum import Enum
 from enum import auto
 from pathlib import Path
 from sys import argv
+from typing import TYPE_CHECKING
 from typing import cast
 
 from PySide6.QtCore import QCoreApplication
@@ -14,18 +13,21 @@ from PySide6.QtWidgets import QLineEdit
 from PySide6.QtWidgets import QTextBrowser
 from PySide6.QtWidgets import QWidget
 
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
 
 def _resource(filename: str) -> Path:
     return Path(__file__).with_name(filename)
 
 
 class PQtDiff3(QWidget):
-    lineEdit: QLineEdit
-    textBrowser: QTextBrowser
-    lineEdit_2: QLineEdit
-    textBrowser_2: QTextBrowser
-    lineEdit_3: QLineEdit
-    textBrowser_3: QTextBrowser
+    line_edit_old: QLineEdit
+    text_browser_old: QTextBrowser
+    line_edit_add: QLineEdit
+    text_browser_add: QTextBrowser
+    line_edit_acc: QLineEdit
+    text_browser_acc: QTextBrowser
 
 
 class Common(Enum):
@@ -36,65 +38,6 @@ class Common(Enum):
     none = auto()
 
 
-def diff3_old(
-    old_lines: list[str], add_lines: list[str], acc_lines: list[str]
-) -> list[Common]:
-    """old_lines -> ~; add_lines -> ListaMovi; acc_lines -> acc."""
-    old_add = SequenceMatcher(
-        a=old_lines, b=add_lines, autojunk=False
-    ).get_opcodes()
-    old_acc = SequenceMatcher(
-        a=old_lines, b=acc_lines, autojunk=False
-    ).get_opcodes()
-
-    #    old_add:
-    #    insert 0 0 0 1
-    #    equal 0 2 1 3
-    #    delete 2 4 3 3
-    #    old_acc:
-    #    insert 0 0 0 1
-    #    equal 0 4 1 5
-    def gen() -> Iterator[Common]:
-        old_add_itor = iter(old_add)
-        old_acc_itor = iter(old_acc)
-        while True:
-            try:
-                add_tag, add_i1, add_i2, add_j1, add_j2 = next(old_add_itor)
-            except StopIteration:
-                break
-
-            if add_tag == 'equal':  # old == add
-                n = add_i2 - add_i1
-                assert add_j2 - add_j1 == n, f'{add_j2 - add_j1=}, {n=}'
-
-                try:
-                    acc_tag, acc_i1, acc_i2, acc_j1, acc_j2 = next(old_acc_itor)
-                except StopIteration:
-                    break
-
-                if acc_tag == 'equal':  # all equal
-                    m = acc_i2 - acc_i1
-                    assert acc_j2 - acc_j1 == m, f'{acc_j2 - acc_j1=}, {m=}'
-                    if n == m:
-                        for _ in range(n):
-                            yield Common.all
-                    elif n < m:
-                        for _ in range(n):
-                            yield Common.all
-                        for _ in range(m - n):
-                            yield Common.old_acc
-                    else:
-                        for _ in range(n):
-                            yield Common.all
-                        for _ in range(m - n):
-                            yield Common.add_acc
-                    continue
-            elif add_tag == 'insert':  # no old, in add
-                ...
-
-    return list(gen())
-
-
 def diff3(
     old_lines: list[str], add_lines: list[str], acc_lines: list[str]
 ) -> list[Common]:
@@ -102,7 +45,7 @@ def diff3(
     add_itor = iter(add_lines)
     acc_itor = iter(acc_lines)
 
-    def gen() -> Iterator[Common]:
+    def gen() -> 'Iterator[Common]':
         old = next(old_itor, None)
         add = next(add_itor, None)
         acc = next(acc_itor, None)
@@ -140,9 +83,10 @@ def html(lines: list[str], commons: list[Common], selected: set[Common]) -> str:
         Common.old_add: 'lightred',
         Common.old_acc: 'lightblue',
         Common.add_acc: 'lightcyan',
+        Common.none: 'black',
     }
 
-    def gen() -> Iterator[str]:
+    def gen() -> 'Iterator[str]':
         for line, color in zip(
             lines, (colors[c] for c in commons if c in selected), strict=True
         ):
@@ -157,33 +101,31 @@ def html(lines: list[str], commons: list[Common], selected: set[Common]) -> str:
 
 def get_p_qt_diff3(old: Path, add: Path, acc: Path) -> PQtDiff3:
     p_qt_diff3 = cast(PQtDiff3, QUiLoader().load(_resource('pqtdiff3.ui')))
-    p_qt_diff3.lineEdit.setText(str(old))
-    p_qt_diff3.lineEdit_2.setText(str(add))
-    p_qt_diff3.lineEdit_3.setText(str(acc))
+    p_qt_diff3.line_edit_old.setText(str(old))
+    p_qt_diff3.line_edit_add.setText(str(add))
+    p_qt_diff3.line_edit_acc.setText(str(acc))
 
     old_lines = old.read_text().splitlines(keepends=True)
     add_lines = add.read_text().splitlines(keepends=True)
     acc_lines = acc.read_text().splitlines(keepends=True)
 
     common_lines = diff3(old_lines, add_lines, acc_lines)
-    for common_line in common_lines:
-        print(common_line)
 
-    p_qt_diff3.textBrowser.setHtml(
+    p_qt_diff3.text_browser_old.setHtml(
         html(
             old_lines,
             common_lines,
             {Common.all, Common.old_add, Common.old_acc},
         )
     )
-    p_qt_diff3.textBrowser_2.setHtml(
+    p_qt_diff3.text_browser_add.setHtml(
         html(
             add_lines,
             common_lines,
             {Common.all, Common.old_add, Common.add_acc},
         )
     )
-    p_qt_diff3.textBrowser_3.setHtml(
+    p_qt_diff3.text_browser_acc.setHtml(
         html(
             acc_lines,
             common_lines,
