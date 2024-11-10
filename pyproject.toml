@@ -1,13 +1,11 @@
 [build-system]
 build-backend = "pdm.backend"
-
 requires = [ "pdm-backend" ]
 
 [project]
 name = "zeed-pqtdiff3"
 version = "0.1.0"
 description = "python+qt based kdiff3 clone"
-readme = "README.md"
 license = { text = "AGPL-3.0-or-later" }
 
 authors = [
@@ -39,7 +37,7 @@ start = 'pqtdiff3'
 
 [tool.ruff]
 line-length = 80
-src = [ "src" ]
+src = [ "src", "tests" ]
 fix = true
 format.quote-style = "single"
 format.skip-magic-trailing-comma = true
@@ -71,6 +69,6 @@ column_width = 80
 indent = 4
 
 [tool.mypy]
-mypy_path = [ "src" ]
+mypy_path = [ "src", "tests" ]
 strict = true
 warn_unused_configs = true
