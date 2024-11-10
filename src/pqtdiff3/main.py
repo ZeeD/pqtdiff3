@@ -1,6 +1,7 @@
 from difflib import SequenceMatcher
 from enum import Enum
 from enum import auto
+from itertools import permutations
 from pathlib import Path
 from sys import argv
 from typing import TYPE_CHECKING
@@ -12,9 +13,11 @@ from PySide6.QtCore import Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication
 from PySide6.QtWidgets import QLineEdit
+from PySide6.QtWidgets import QScrollBar
 from PySide6.QtWidgets import QTextBrowser
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Iterator
 
 
@@ -82,8 +85,31 @@ def get_commons(
     return commons
 
 
+def bind_scroll_bars(scroll_bars: 'Iterable[QScrollBar]') -> None:
+    for sb1, sb2 in permutations(scroll_bars, 2):
+        sb1.valueChanged.connect(sb2.setValue)
+
+
 def get_p_qt_diff3(old: Path, add: Path, acc: Path) -> PQtDiff3:
     p_qt_diff3 = cast(PQtDiff3, QUiLoader().load(_resource('pqtdiff3.ui')))
+
+    bind_scroll_bars(
+        tb.verticalScrollBar()
+        for tb in [
+            p_qt_diff3.text_browser_old,
+            p_qt_diff3.text_browser_add,
+            p_qt_diff3.text_browser_acc,
+        ]
+    )
+    bind_scroll_bars(
+        tb.horizontalScrollBar()
+        for tb in [
+            p_qt_diff3.text_browser_old,
+            p_qt_diff3.text_browser_add,
+            p_qt_diff3.text_browser_acc,
+        ]
+    )
+
     p_qt_diff3.line_edit_old.setText(str(old))
     p_qt_diff3.line_edit_add.setText(str(add))
     p_qt_diff3.line_edit_acc.setText(str(acc))
