@@ -47,9 +47,9 @@ class Common(Enum):
 def html(lines: list[str], commons: list[Common]) -> str:
     colors: dict[Common, str] = {
         Common.all: 'lightgreen',
-        Common.old_add: 'lightred',
-        Common.old_acc: 'lightblue',
-        Common.add_acc: 'lightcyan',
+        Common.old_add: 'lightyellow',
+        Common.old_acc: 'lightcoral',
+        Common.add_acc: 'lightsteelblue',
         Common.none: 'lightgray',
     }
 
