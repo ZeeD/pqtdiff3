@@ -151,6 +151,11 @@ def get_p_qt_diff3(old: Path, add: Path, acc: Path) -> PQtDiff3:
 
     return p_qt_diff3
 
+def pqtdiff3(app: QApplication) -> PQtDiff3:
+    orig, new, merged = (Path(arg) for arg in app.arguments()[1:])
+
+    return get_p_qt_diff3(orig, new, merged)
+
 
 def main() -> None:
     QCoreApplication.setAttribute(
@@ -158,9 +163,7 @@ def main() -> None:
     )
     app = QApplication(argv)
 
-    orig, new, merged = (Path(arg) for arg in app.arguments()[1:])
-
-    p_qt_diff3 = get_p_qt_diff3(orig, new, merged)
-    p_qt_diff3.show()
+    widget = pqtdiff3(app)
+    widget.show()
 
     raise SystemExit(app.exec())
