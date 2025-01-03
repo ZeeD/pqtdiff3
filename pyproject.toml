@@ -35,7 +35,7 @@ lint = { composite = [
     "mypy {args:.}",
 ] }
 start = 'pqtdiff3'
-test = "python -m unittest discover -v --locals -s tests"
+test = "python -m unittest discover -s tests"
 
 [tool.ruff]
 line-length = 80
