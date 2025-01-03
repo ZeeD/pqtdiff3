@@ -6,7 +6,7 @@ requires = [ "pdm-backend" ]
 name = "zeed-pqtdiff3"
 version = "0.1.0"
 description = "python+qt based kdiff3 clone"
-license = { text = "AGPL-3.0-or-later" }
+license = { file = "LICENSE" }
 authors = [
     { name = "ZeeD", email = "vito.detullio@gmail.com" },
 ]
