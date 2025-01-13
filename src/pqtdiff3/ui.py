@@ -36,7 +36,9 @@ class PQtDiff3(Protocol):
     def show(self) -> None: ...
 
 
-def html(lines: list[str], commons: list[Common], others_commons: list[list[Common]]) -> str:
+def html(
+    lines: list[str], commons: list[Common], others_commons: list[list[Common]]
+) -> str:
     colors: dict[Common, str] = {
         Common.all: 'lightgreen',
         Common.old_add: 'lightyellow',
@@ -103,8 +105,14 @@ def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
         acc_lines, [old_lines, add_lines], [Common.old_acc, Common.add_acc]
     )
 
-    ui.text_browser_old.setHtml(html(old_lines, old_commons, [add_commons, acc_commons]))
-    ui.text_browser_add.setHtml(html(add_lines, add_commons, [old_commons, acc_commons]))
-    ui.text_browser_acc.setHtml(html(acc_lines, acc_commons, [add_commons, old_commons]))
+    ui.text_browser_old.setHtml(
+        html(old_lines, old_commons, [add_commons, acc_commons])
+    )
+    ui.text_browser_add.setHtml(
+        html(add_lines, add_commons, [old_commons, acc_commons])
+    )
+    ui.text_browser_acc.setHtml(
+        html(acc_lines, acc_commons, [add_commons, old_commons])
+    )
 
     return ui

@@ -56,14 +56,14 @@ def _fillblanks(
                     next(other_commons_it, None)
                     for other_commons_it in others_commons_its
                 ]
-                if all(other is None for other in others):
+                if any(other is None for other in others):
+                    yield line, common
                     break
-                # TODO: handle common A-C
-                if all(other is Common.all for other in others):
+                if any(other is Common.all for other in others):
                     yield line, common
                     break
                 # hole
-                yield '&lt;emtpy&gt;', Common.empty
+                yield ' ', Common.empty
         else:
             # consume others
             for other_commons_it in others_commons_its:
@@ -78,7 +78,7 @@ def _fillblanks(
         ]
         if all(others_commons_dones):
             break
-        yield '', Common.empty
+        yield ' ', Common.empty
 
 
 def fillblanks(
