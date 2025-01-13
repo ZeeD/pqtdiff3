@@ -6,6 +6,8 @@ from typing import cast
 
 from PySide6.QtUiTools import QUiLoader
 
+from pqtdiff3.diff3 import fillblanks
+
 from .diff3 import Common
 from .diff3 import get_commons
 
@@ -34,7 +36,7 @@ class PQtDiff3(Protocol):
     def show(self) -> None: ...
 
 
-def html(lines: list[str], commons: list[Common]) -> str:
+def html(lines: list[str], commons: list[Common], others_commons: list[list[Common]]) -> str:
     colors: dict[Common, str] = {
         Common.all: 'lightgreen',
         Common.old_add: 'lightyellow',
@@ -45,9 +47,8 @@ def html(lines: list[str], commons: list[Common]) -> str:
     }
 
     def gen() -> 'Iterator[str]':
-        for line, color in zip(
-            lines, (colors[c] for c in commons), strict=True
-        ):
+        for line, common in fillblanks(lines, commons, others_commons):
+            color = colors[common]
             yield f'<pre style="background-color: {color}">{line}</pre>'
 
     return (
@@ -102,8 +103,8 @@ def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
         acc_lines, [old_lines, add_lines], [Common.old_acc, Common.add_acc]
     )
 
-    ui.text_browser_old.setHtml(html(old_lines, old_commons))
-    ui.text_browser_add.setHtml(html(add_lines, add_commons))
-    ui.text_browser_acc.setHtml(html(acc_lines, acc_commons))
+    ui.text_browser_old.setHtml(html(old_lines, old_commons, [add_commons, acc_commons]))
+    ui.text_browser_add.setHtml(html(add_lines, add_commons, [old_commons, acc_commons]))
+    ui.text_browser_acc.setHtml(html(acc_lines, acc_commons, [add_commons, old_commons]))
 
     return ui
