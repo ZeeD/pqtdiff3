@@ -6,10 +6,9 @@ from typing import cast
 
 from PySide6.QtUiTools import QUiLoader
 
+from pqtdiff3.diff3 import Common
 from pqtdiff3.diff3 import fillblanks
-
-from .diff3 import Common
-from .diff3 import get_commons
+from pqtdiff3.diff3 import get_commons
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -65,35 +64,17 @@ def bind_scroll_bars(scroll_bars: 'Iterable[QScrollBar]') -> None:
         sb1.valueChanged.connect(sb2.setValue)
 
 
-def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
-    orig, new, merged = (Path(arg) for arg in app.arguments()[1:])
+def get_lines(path: str) -> list[str]:
+    return [s.strip() for s in Path(path).read_text().splitlines()]
 
-    ui = cast(PQtDiff3, QUiLoader().load(_resource('pqtdiff3.ui')))
+def reload(ui: PQtDiff3) -> None:
+    orig = ui.line_edit_old.text()
+    new = ui.line_edit_add.text()
+    merged = ui.line_edit_acc.text()
 
-    bind_scroll_bars(
-        tb.verticalScrollBar()
-        for tb in [
-            ui.text_browser_old,
-            ui.text_browser_add,
-            ui.text_browser_acc,
-        ]
-    )
-    bind_scroll_bars(
-        tb.horizontalScrollBar()
-        for tb in [
-            ui.text_browser_old,
-            ui.text_browser_add,
-            ui.text_browser_acc,
-        ]
-    )
-
-    ui.line_edit_old.setText(str(orig))
-    ui.line_edit_add.setText(str(new))
-    ui.line_edit_acc.setText(str(merged))
-
-    old_lines = orig.read_text().splitlines()
-    add_lines = new.read_text().splitlines()
-    acc_lines = merged.read_text().splitlines()
+    old_lines = get_lines(orig)
+    add_lines = get_lines(new)
+    acc_lines = get_lines(merged)
 
     old_commons = get_commons(
         old_lines, [add_lines, acc_lines], [Common.old_add, Common.old_acc]
@@ -114,5 +95,34 @@ def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
     ui.text_browser_acc.setHtml(
         html(acc_lines, acc_commons, [add_commons, old_commons])
     )
+
+
+def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
+    orig, new, merged = app.arguments()[1:]
+
+    ui = cast('PQtDiff3', QUiLoader().load(_resource('pqtdiff3.ui')))
+
+    bind_scroll_bars(
+        tb.verticalScrollBar()
+        for tb in [
+            ui.text_browser_old,
+            ui.text_browser_add,
+            ui.text_browser_acc,
+        ]
+    )
+    bind_scroll_bars(
+        tb.horizontalScrollBar()
+        for tb in [
+            ui.text_browser_old,
+            ui.text_browser_add,
+            ui.text_browser_acc,
+        ]
+    )
+
+    ui.line_edit_old.setText(orig)
+    ui.line_edit_add.setText(new)
+    ui.line_edit_acc.setText(merged)
+
+    reload(ui)
 
     return ui

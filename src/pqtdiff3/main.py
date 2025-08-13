@@ -4,7 +4,7 @@ from PySide6.QtCore import QCoreApplication
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
 
-from .ui import pqtdiff3
+from pqtdiff3.ui import pqtdiff3
 
 
 def main() -> None:
