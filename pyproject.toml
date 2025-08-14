@@ -4,7 +4,7 @@ requires = [ "pdm-backend" ]
 
 [project]
 name = "zeed-pqtdiff3"
-version = "0.1.0"
+version = "0.1.1"
 description = "python+qt based kdiff3 clone"
 license = { file = "LICENSE" }
 authors = [
