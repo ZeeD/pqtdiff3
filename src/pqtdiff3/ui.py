@@ -48,8 +48,13 @@ def html(
     }
 
     def gen() -> 'Iterator[str]':
-        for line, common in fillblanks(lines, commons, others_commons):
+        for line_, common in fillblanks(lines, commons, others_commons):
             color = colors[common]
+            line = (
+                line_
+                if line_ == ' '
+                else line_.replace(' ', '·').replace('\t', '⇥')
+            )
             yield f'<pre style="background-color: {color}">{line}</pre>'
 
     return (
@@ -66,6 +71,7 @@ def bind_scroll_bars(scroll_bars: 'Iterable[QScrollBar]') -> None:
 
 def get_lines(path: str) -> list[str]:
     return [s.strip() for s in Path(path).read_text().splitlines()]
+
 
 def reload(ui: PQtDiff3) -> None:
     orig = ui.line_edit_old.text()
