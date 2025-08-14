@@ -51,13 +51,13 @@ class TestGetCommons(TestCase):
             ('1com', Common.all),
             ('2cha', Common.none),
             ('3com', Common.all),
-            ('', Common.empty),
-            ('', Common.empty),
-            ('', Common.empty),
-            ('', Common.empty),
+            (' ', Common.empty),
+            (' ', Common.empty),
+            (' ', Common.empty),
+            (' ', Common.empty),
             ('8com', Common.all),
-            ('', Common.empty),
-            ('', Common.empty),
+            (' ', Common.empty),
+            (' ', Common.empty),
         ]
         actual = fillblanks(lines, commons, others_commons)
         self.assertListEqual(expected, actual)
