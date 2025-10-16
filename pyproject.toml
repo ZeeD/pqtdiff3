@@ -45,7 +45,7 @@ lint = { composite = [
     "mypy {args:.}",
 ] }
 start = 'pqtdiff3'
-tests = { composite = [
+test = { composite = [
     "coverage run -m unittest discover --verbose --locals --failfast --catch --start-directory tests",
     "coverage report",
     "coverage erase",
