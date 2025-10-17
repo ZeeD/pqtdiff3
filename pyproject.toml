@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dependencies = [ "pyside6>=6.8.2" ]
+dependencies = [ "pyside6-essentials>=6.10" ]
 urls.Homepage = "https://github.com/ZeeD/pqtdiff3"
 urls.Repository = "https://github.com/ZeeD/pqtdiff3.git"
 gui-scripts.pqtdiff3 = "pqtdiff3.main:main"
