@@ -5,11 +5,7 @@ requires = [ "pdm-backend" ]
 [project]
 name = "zeed-pqtdiff3"
 version = "0.1.1"
-description = "python+qt based kdiff3 clone"
 license = { file = "LICENSE" }
-authors = [
-    { name = "ZeeD", email = "vito.detullio@gmail.com" },
-]
 requires-python = ">=3.12,<3.14"
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
@@ -41,15 +37,15 @@ _.env = { PYTHONPATH = "src:tests" }
 lint = { composite = [
     "pyproject-fmt pyproject.toml",
     "ruff format {args:.}",
-    "ruff check --exit-zero {args:.}",
+    "ruff check {args:.}",
     "mypy {args:.}",
-] }
-start = 'pqtdiff3'
+], keep_going = true }
 test = { composite = [
-    "coverage run -m unittest discover --verbose --locals --failfast --catch --start-directory tests",
+    "coverage run -m unittest discover --verbose --locals --failfast --catch --start-directory tests {args}",
     "coverage report",
     "coverage erase",
 ] }
+start = "pqtdiff3"
 bump_and_publish = { composite = [
     "pdm bump patch --commit --tag",
     # "pdm publish",
@@ -66,14 +62,26 @@ format.skip-magic-trailing-comma = true
 format.docstring-code-format = true
 lint.select = [ "ALL" ]
 lint.ignore = [
-    "COM812", # conflicts with formatter
-    "D1",     # disabled by me
-    "D203",   # incompatibility with D211
-    "D213",   # incompatibility with D212
-    "ISC001", # conflicts with formatter
+    "ANN1",
+    "COM812",
+    "D1",
+    "D203",
+    "D213",
+    "ISC001",
     "PT009",
-    "Q001",   # conflicts with formatter
-    "Q002",   # conflicts with formatter
+    "PT027",
+    "Q001",
+    "Q002",
+    "TD002",
+    "TD003",
+]
+lint.extend-per-file-ignores."stubs/**/*.pyi" = [
+    "FBT001",
+    "FBT002",
+    "N802",
+    "N803",
+    "N815",
+    "PLR0913",
 ]
 lint.flake8-annotations.allow-star-arg-any = true
 lint.flake8-quotes.docstring-quotes = "single"
