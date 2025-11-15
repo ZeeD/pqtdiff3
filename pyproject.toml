@@ -45,7 +45,7 @@ test = { composite = [
     "coverage report",
     "coverage erase",
 ] }
-start = "pqtdiff3"
+start = { call = "pqtdiff3.main:main" }
 bump_and_publish = { composite = [
     "pdm bump patch --commit --tag",
     # "pdm publish",
