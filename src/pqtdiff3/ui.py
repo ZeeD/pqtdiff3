@@ -104,7 +104,11 @@ def reload(ui: PQtDiff3) -> None:
 
 
 def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
-    orig, new, merged = app.arguments()[1:]
+    try:
+        orig, new, merged = app.arguments()[1:]
+    except ValueError:
+        msg = f'uso: {app.arguments()[0]} orig new merged'
+        raise SystemExit(msg) from None
 
     ui = cast('PQtDiff3', QUiLoader().load(_resource('pqtdiff3.ui')))
 
