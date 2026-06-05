@@ -31,23 +31,23 @@ distribution = true
 plugins = [ "pdm-bump" ]
 build.excludes = [ "tests" ]
 scripts._.env = { PYTHONPATH = "src:tests" }
+scripts.bump_and_publish = { composite = [
+    "pdm bump patch --commit --tag",
+    # "pdm publish",
+    "git push",
+    "git push --tags",
+] }
 scripts.lint = { composite = [
     "pyproject-fmt pyproject.toml",
     "ruff format {args:.}",
     "ruff check {args:.}",
     "mypy {args:.}",
 ], keep_going = true }
+scripts.start = "pqtdiff3"
 scripts.test = { composite = [
     "coverage run -m unittest discover --verbose --locals --failfast --catch --start-directory tests {args}",
     "coverage report",
     "coverage erase",
-] }
-scripts.start = "pqtdiff3"
-scripts.bump_and_publish = { composite = [
-    "pdm bump patch --commit --tag",
-    # "pdm publish",
-    "git push",
-    "git push --tags",
 ] }
 
 [tool.ruff]
