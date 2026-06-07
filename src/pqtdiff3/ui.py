@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from PySide6.QtWidgets import QApplication
     from PySide6.QtWidgets import QLineEdit
     from PySide6.QtWidgets import QScrollBar
+    from PySide6.QtWidgets import QSplitter
     from PySide6.QtWidgets import QTextBrowser
 
 
@@ -31,6 +32,7 @@ class PQtDiff3(Protocol):
     text_browser_add: 'QTextBrowser'
     line_edit_acc: 'QLineEdit'
     text_browser_acc: 'QTextBrowser'
+    splitter_acc:'QSplitter'
 
     def show(self) -> None: ...
 
@@ -69,8 +71,16 @@ def bind_scroll_bars(scroll_bars: 'Iterable[QScrollBar]') -> None:
         sb1.valueChanged.connect(sb2.setValue)
 
 
-def get_lines(path: str) -> list[str]:
-    return [s.strip() for s in Path(path).read_text().splitlines()]
+def get_lines(path: str | None) -> list[str]:
+    if path is None:
+        return []
+
+    try:
+        text = Path(path).read_text()
+    except OSError:
+        return []
+
+    return [s.strip() for s in text.splitlines()]
 
 
 def reload(ui: PQtDiff3) -> None:
@@ -104,13 +114,24 @@ def reload(ui: PQtDiff3) -> None:
 
 
 def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
+    args = app.arguments()[1:]
+    two: bool
     try:
-        orig, new, merged = app.arguments()[1:]
+        orig, new, merged = args
+        two = False
     except ValueError:
-        msg = f'uso: {app.arguments()[0]} orig new merged'
-        raise SystemExit(msg) from None
+        try:
+            orig, new = args
+            merged =None
+            two = True
+        except ValueError:
+            msg = f'uso: {app.arguments()[0]} orig new [merged]'
+            raise SystemExit(msg) from None
 
     ui = cast('PQtDiff3', QUiLoader().load(_resource('pqtdiff3.ui')))
+
+    if two:
+        ui.splitter_acc.setVisible(False)
 
     bind_scroll_bars(
         tb.verticalScrollBar()
