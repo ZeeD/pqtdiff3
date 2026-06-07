@@ -13,7 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = [ "pyside6-essentials>=6.11" ]
+dependencies = [ "conflict-parser>=0.0.2", "pyside6-essentials>=6.11" ]
 urls.Homepage = "https://github.com/ZeeD/pqtdiff3"
 urls.Repository = "https://github.com/ZeeD/pqtdiff3.git"
 gui-scripts.pqtdiff3 = "pqtdiff3.main:main"
@@ -33,7 +33,7 @@ build.excludes = [ "tests" ]
 scripts._.env = { PYTHONPATH = "src:tests" }
 scripts.bump_and_publish = { composite = [
     "pdm bump patch --commit --tag",
-    # "pdm publish",
+    # 'pdm publish',
     "git push",
     "git push --tags",
 ] }
@@ -95,6 +95,9 @@ indent = 4
 mypy_path = [ "src", "tests" ]
 strict = true
 warn_unused_configs = true
+overrides = [
+    { module = [ "conflict_parser.*" ], follow_untyped_imports = true }
+]
 
 [tool.coverage]
 run.branch = true

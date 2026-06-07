@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:4bf65f9517ae6b7f483ffc5c3bc1852e9ab19818513eb2768a02b4fc4efe0978"
+content_hash = "sha256:d2f59f8bc2f4bc81552f84519c7c2eea3c9260262f5c68c2e8f8aedc75e926ac"
 
 [[metadata.targets]]
 requires_python = ">=3.12,<3.15"
@@ -50,6 +50,17 @@ files = [
     {file = "ast_serialize-0.5.0-cp39-abi3-win_amd64.whl", hash = "sha256:cf25572c526add400f26a4750dc6ce0c3bb93fc1f75e7ae0cad4ce4f2cd5c590"},
     {file = "ast_serialize-0.5.0-cp39-abi3-win_arm64.whl", hash = "sha256:92a31c9c20d25a076edaeec76b128a3535d74a24f340b9a8a7e96c9b86dc9642"},
     {file = "ast_serialize-0.5.0.tar.gz", hash = "sha256:5880091bfe6f4f986f22866375c2e884843e7a0b6343ae41aeea659613d879b6"},
+]
+
+[[package]]
+name = "conflict-parser"
+version = "0.0.2"
+requires_python = ">=3.10"
+summary = "Object representation of a Git merge conflict."
+groups = ["default"]
+files = [
+    {file = "conflict_parser-0.0.2-py3-none-any.whl", hash = "sha256:4f5d2beb03896af9b2f545b21881c722ab3f9f75891263433f95f07d2c6334da"},
+    {file = "conflict_parser-0.0.2.tar.gz", hash = "sha256:3d441e52a33703387a69d282fddcc00fb731fde24913bd124141f8910df11e0c"},
 ]
 
 [[package]]

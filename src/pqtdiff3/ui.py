@@ -120,14 +120,6 @@ def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
             ui.text_browser_acc,
         ]
     )
-    bind_scroll_bars(
-        tb.horizontalScrollBar()
-        for tb in [
-            ui.text_browser_old,
-            ui.text_browser_add,
-            ui.text_browser_acc,
-        ]
-    )
 
     ui.line_edit_old.setText(orig)
     ui.line_edit_add.setText(new)
