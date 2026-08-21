@@ -4,7 +4,7 @@ requires = [ "pdm-backend" ]
 
 [project]
 name = "zeed-pqtdiff3"
-version = "0.1.1"
+version = "0.1.2"
 license = { file = "LICENSE" }
 requires-python = ">=3.12,<3.15"
 classifiers = [
