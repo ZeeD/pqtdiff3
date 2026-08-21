@@ -5,6 +5,7 @@ from typing import Protocol
 from typing import cast
 
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QTextBrowser
 
 from pqtdiff3.diff3 import Common
 from pqtdiff3.diff3 import fillblanks
@@ -18,7 +19,6 @@ if TYPE_CHECKING:
     from PySide6.QtWidgets import QLineEdit
     from PySide6.QtWidgets import QScrollBar
     from PySide6.QtWidgets import QSplitter
-    from PySide6.QtWidgets import QTextBrowser
 
 
 def _resource(filename: str) -> Path:
@@ -32,7 +32,7 @@ class PQtDiff3(Protocol):
     text_browser_add: 'QTextBrowser'
     line_edit_acc: 'QLineEdit'
     text_browser_acc: 'QTextBrowser'
-    splitter_acc:'QSplitter'
+    splitter_acc: 'QSplitter'
 
     def show(self) -> None: ...
 
@@ -122,7 +122,7 @@ def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
     except ValueError:
         try:
             orig, new = args
-            merged =None
+            merged = None
             two = True
         except ValueError:
             msg = f'uso: {app.arguments()[0]} orig new [merged]'
@@ -133,14 +133,18 @@ def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
     if two:
         ui.splitter_acc.setVisible(False)
 
-    bind_scroll_bars(
-        tb.verticalScrollBar()
-        for tb in [
-            ui.text_browser_old,
-            ui.text_browser_add,
-            ui.text_browser_acc,
-        ]
-    )
+    for get_scrollbar in (
+        QTextBrowser.verticalScrollBar,
+        QTextBrowser.horizontalScrollBar,
+    ):
+        bind_scroll_bars(
+            get_scrollbar(tb)
+            for tb in [
+                ui.text_browser_old,
+                ui.text_browser_add,
+                ui.text_browser_acc,
+            ]
+        )
 
     ui.line_edit_old.setText(orig)
     ui.line_edit_add.setText(new)

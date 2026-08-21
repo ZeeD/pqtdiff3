@@ -61,6 +61,7 @@ lint.select = [ "ALL" ]
 lint.ignore = [
     "ANN1",
     "COM812",
+    "CPY001",
     "D1",
     "D203",
     "D213",
@@ -100,8 +101,8 @@ overrides = [
 ]
 
 [tool.coverage]
-run.branch = true
 run.source = [ "src", "tests" ]
-report.show_missing = true
+run.branch = true
 report.skip_empty = true
+report.show_missing = true
 report.sort = "Cover"

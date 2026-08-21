@@ -73,7 +73,7 @@ def _annotate_conflict_segment(
             ret.append(AnnotatedRow((Common.old_acc, i, ours_line.rstrip())))
         elif ours_line is not None and ours_line == base_line:
             ret.append(AnnotatedRow((Common.old_add, i, ours_line.rstrip())))
-        elif theirs_line is not None and  theirs_line == base_line:
+        elif theirs_line is not None and theirs_line == base_line:
             ret.append(AnnotatedRow((Common.add_acc, i, theirs_line.rstrip())))
         else:
             if ours_line is not None:
