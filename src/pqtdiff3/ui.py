@@ -1,11 +1,22 @@
 from itertools import permutations
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import ClassVar
 from typing import Protocol
 from typing import cast
+from typing import override
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
+from PySide6.QtGui import QColorConstants
+from PySide6.QtGui import QPainter
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QProxyStyle
+from PySide6.QtWidgets import QStyle
+from PySide6.QtWidgets import QStyleOptionComplex
+from PySide6.QtWidgets import QStyleOptionSlider
 from PySide6.QtWidgets import QTextBrowser
+from PySide6.QtWidgets import QWidget
 
 from pqtdiff3.diff3 import Common
 from pqtdiff3.diff3 import fillblanks
@@ -37,9 +48,7 @@ class PQtDiff3(Protocol):
     def show(self) -> None: ...
 
 
-def html(
-    lines: list[str], commons: list[Common], others_commons: list[list[Common]]
-) -> str:
+def html(blanks_filled: list[tuple[str, Common]]) -> str:
     colors: dict[Common, str] = {
         Common.all: 'lightgreen',
         Common.old_add: 'lightyellow',
@@ -50,7 +59,7 @@ def html(
     }
 
     def gen() -> 'Iterator[str]':
-        for line_, common in fillblanks(lines, commons, others_commons):
+        for line_, common in blanks_filled:
             color = colors[common]
             line = (
                 line_
@@ -83,6 +92,21 @@ def get_lines(path: str | None) -> list[str]:
     return [s.strip() for s in text.splitlines()]
 
 
+def set_html_and_ticks(
+    tb: QTextBrowser,
+    lines: list[str],
+    commons: list[Common],
+    others_commons: list[list[Common]],
+) -> None:
+    blanks_filled = fillblanks(lines, commons, others_commons)
+    tb.setHtml(html(blanks_filled))
+
+    style = tb.verticalScrollBar().style()
+    if not isinstance(style, TickStyle):
+        raise TypeError
+    style.lines = [common for (_, common) in blanks_filled]
+
+
 def reload(ui: PQtDiff3) -> None:
     orig = ui.line_edit_old.text()
     new = ui.line_edit_add.text()
@@ -102,15 +126,65 @@ def reload(ui: PQtDiff3) -> None:
         acc_lines, [old_lines, add_lines], [Common.old_acc, Common.add_acc]
     )
 
-    ui.text_browser_old.setHtml(
-        html(old_lines, old_commons, [add_commons, acc_commons])
+    set_html_and_ticks(
+        ui.text_browser_old, old_lines, old_commons, [add_commons, acc_commons]
     )
-    ui.text_browser_add.setHtml(
-        html(add_lines, add_commons, [old_commons, acc_commons])
+    set_html_and_ticks(
+        ui.text_browser_add, add_lines, add_commons, [old_commons, acc_commons]
     )
-    ui.text_browser_acc.setHtml(
-        html(acc_lines, acc_commons, [add_commons, old_commons])
+    set_html_and_ticks(
+        ui.text_browser_acc, acc_lines, acc_commons, [add_commons, old_commons]
     )
+
+
+class TickStyle(QProxyStyle):
+    lines: list[Common]
+    colors: ClassVar[dict[Common, QColor]] = {
+        Common.all: QColorConstants.Green,
+        Common.old_add: QColorConstants.Yellow,
+        Common.old_acc: QColorConstants.Red,
+        Common.add_acc: QColorConstants.Blue,
+        Common.none: QColorConstants.Gray,
+        Common.empty: QColorConstants.White,
+    }
+
+    @override
+    def drawComplexControl(
+        self,
+        control: QStyle.ComplexControl,
+        option: QStyleOptionComplex,
+        painter: QPainter,
+        widget: QWidget | None = None,
+    ) -> None:
+        super().drawComplexControl(control, option, painter, widget=widget)
+        if widget is None:
+            return
+
+        # check if control type and orientation match
+        if control != QStyle.ComplexControl.CC_ScrollBar:
+            return
+        if not isinstance(option, QStyleOptionSlider):
+            raise TypeError
+        if option.orientation != Qt.Orientation.Vertical:
+            return
+
+        if not self.lines:
+            return
+
+        zero = self.subControlRect(
+            control, option, QStyle.SubControl.SC_ScrollBarAddLine, widget
+        ).height()
+        rect = self.subControlRect(
+            control, option, QStyle.SubControl.SC_ScrollBarGroove, widget
+        )
+        width = rect.width()
+        height = rect.height()
+        n = len(self.lines)
+
+        for i, line in enumerate(self.lines):
+            y = zero + (height * i / n)
+            color = type(self).colors[line]
+            painter.fillRect(width - 5, int(y), 5, 1, color)
 
 
 def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
@@ -133,18 +207,17 @@ def pqtdiff3(app: 'QApplication') -> 'PQtDiff3':
     if two:
         ui.splitter_acc.setVisible(False)
 
+    tbs = [ui.text_browser_old, ui.text_browser_add, ui.text_browser_acc]
+
     for get_scrollbar in (
         QTextBrowser.verticalScrollBar,
         QTextBrowser.horizontalScrollBar,
     ):
-        bind_scroll_bars(
-            get_scrollbar(tb)
-            for tb in [
-                ui.text_browser_old,
-                ui.text_browser_add,
-                ui.text_browser_acc,
-            ]
-        )
+        bind_scroll_bars(get_scrollbar(tb) for tb in tbs)
+
+    for tb in tbs:
+        scrollbar = tb.verticalScrollBar()
+        scrollbar.setStyle(TickStyle())
 
     ui.line_edit_old.setText(orig)
     ui.line_edit_add.setText(new)
