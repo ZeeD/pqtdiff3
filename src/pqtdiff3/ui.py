@@ -1,7 +1,7 @@
 from itertools import permutations
 from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import ClassVar
+from typing import Final
 from typing import Protocol
 from typing import cast
 from typing import override
@@ -48,19 +48,20 @@ class PQtDiff3(Protocol):
     def show(self) -> None: ...
 
 
-def html(blanks_filled: list[tuple[str, Common]]) -> str:
-    colors: dict[Common, str] = {
-        Common.all: 'lightgreen',
-        Common.old_add: 'lightyellow',
-        Common.old_acc: 'lightcoral',
-        Common.add_acc: 'lightsteelblue',
-        Common.none: 'lightgray',
-        Common.empty: 'white',
-    }
+COLORS: Final[dict[Common, tuple[str, QColor]]] = {
+    Common.all: ('lightgreen', QColorConstants.DarkGreen),
+    Common.old_add: ('lightyellow', QColorConstants.DarkYellow),
+    Common.old_acc: ('lightcoral', QColorConstants.DarkRed),
+    Common.add_acc: ('lightsteelblue', QColorConstants.DarkBlue),
+    Common.none: ('lightgray', QColorConstants.DarkGray),
+    Common.empty: ('white', QColorConstants.LightGray),
+}
 
+
+def html(blanks_filled: list[tuple[str, Common]]) -> str:
     def gen() -> 'Iterator[str]':
         for line_, common in blanks_filled:
-            color = colors[common]
+            color, _ = COLORS[common]
             line = (
                 line_
                 if line_ == ' '
@@ -69,7 +70,7 @@ def html(blanks_filled: list[tuple[str, Common]]) -> str:
             yield f'<pre style="background-color: {color}">{line}</pre>'
 
     return (
-        """<html><head><style>* { margin: 0 }</style></head><body>"""
+        """<html><head><style>pre { margin: 0; }</style></head><body>"""
         + ''.join(gen())
         + '</body></html>'
     )
@@ -139,14 +140,6 @@ def reload(ui: PQtDiff3) -> None:
 
 class TickStyle(QProxyStyle):
     lines: list[Common]
-    colors: ClassVar[dict[Common, QColor]] = {
-        Common.all: QColorConstants.Green,
-        Common.old_add: QColorConstants.Yellow,
-        Common.old_acc: QColorConstants.Red,
-        Common.add_acc: QColorConstants.Blue,
-        Common.none: QColorConstants.Gray,
-        Common.empty: QColorConstants.White,
-    }
 
     @override
     def drawComplexControl(
@@ -183,7 +176,7 @@ class TickStyle(QProxyStyle):
 
         for i, line in enumerate(self.lines):
             y = zero + (height * i / n)
-            color = type(self).colors[line]
+            _, color = COLORS[line]
             painter.fillRect(width - 5, int(y), 5, 1, color)
 
 
