@@ -13,48 +13,116 @@
   <property name="windowTitle">
    <string>pqtdiff3</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QSplitter" name="splitter_old">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
-     </property>
-     <widget class="QLineEdit" name="line_edit_old">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QTextBrowser" name="text_browser_old"/>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QSplitter" name="splitter_old">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <widget class="QLineEdit" name="line_edit_old">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QTextBrowser" name="text_browser_old"/>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSplitter" name="splitter_add">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <widget class="QLineEdit" name="line_edit_add">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QTextBrowser" name="text_browser_add"/>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSplitter" name="splitter_acc">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <widget class="QLineEdit" name="line_edit_acc">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QTextBrowser" name="text_browser_acc"/>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
-    <widget class="QSplitter" name="splitter_add">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
+    <widget class="QLineEdit" name="line_edit_search">
+     <property name="placeholderText">
+      <string>Filter</string>
      </property>
-     <widget class="QLineEdit" name="line_edit_add">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QTextBrowser" name="text_browser_add"/>
-    </widget>
-   </item>
-   <item>
-    <widget class="QSplitter" name="splitter_acc">
-     <property name="orientation">
-      <enum>Qt::Orientation::Vertical</enum>
-     </property>
-     <widget class="QLineEdit" name="line_edit_acc">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QTextBrowser" name="text_browser_acc"/>
     </widget>
    </item>
   </layout>
+  <action name="action_find">
+   <property name="text">
+    <string>find</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_esc">
+   <property name="text">
+    <string>esc</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>action_find</sender>
+   <signal>changed()</signal>
+   <receiver>line_edit_search</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_esc</sender>
+   <signal>triggered()</signal>
+   <receiver>line_edit_search</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
