@@ -1,3 +1,6 @@
+from signal import SIG_DFL
+from signal import SIGINT
+from signal import signal
 from sys import argv
 from typing import override
 
@@ -35,6 +38,8 @@ def main() -> None:
         Qt.ApplicationAttribute.AA_ShareOpenGLContexts
     )
     app = QApplication(argv)
+
+    signal(SIGINT, SIG_DFL) # restore CTRL+C behaviour
 
     f5_event_filter = F5EventFilter()
     app.installEventFilter(f5_event_filter)
