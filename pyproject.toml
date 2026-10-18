@@ -13,7 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = [ "conflict-parser>=0.0.2", "pyside6-essentials>=6.11" ]
+dependencies = [ "conflict-parser>=0.0.2", "pyside6-essentials==6.12.0" ]
 urls.Homepage = "https://github.com/ZeeD/pqtdiff3"
 urls.Repository = "https://github.com/ZeeD/pqtdiff3.git"
 gui-scripts.pqtdiff3 = "pqtdiff3.main:main"
