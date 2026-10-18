@@ -39,7 +39,7 @@ def main() -> None:
     )
     app = QApplication(argv)
 
-    signal(SIGINT, SIG_DFL) # restore CTRL+C behaviour
+    signal(SIGINT, SIG_DFL)  # restore CTRL+C behaviour
 
     f5_event_filter = F5EventFilter()
     app.installEventFilter(f5_event_filter)
